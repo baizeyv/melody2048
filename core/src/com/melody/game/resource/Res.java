@@ -30,6 +30,7 @@ public class Res {
         String MENU_TITLE = "pausetitle";
         String SCORE_EMPTY = "scorenumber/empty";
         String SCORE_NUMBER_PREFIX = "scorenumber/s";
+        String GAME_OVER = "gameover";
     }
 
     public static interface AUDIO_RES {

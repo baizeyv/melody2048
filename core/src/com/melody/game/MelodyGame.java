@@ -104,6 +104,10 @@ public class MelodyGame extends Game {
 		getGameScreen().getGameStage().removeMenu();
 	}
 
+	public void over() {
+		getGameScreen().getGameStage().gameOver();
+	}
+
 	public void menuRetry() {
 		getGameScreen().getGameStage().getGameGroup().getGameFrameGroup().restart();
 		getGameScreen().getGameStage().getGameGroup().getGameFrameGroup().scoreSync();

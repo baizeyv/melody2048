@@ -34,6 +34,10 @@ public class GameFrameGroup extends BaseGroup {
     private final int ROW = 4;
 
     private final int COL = 4;
+    private float bgCardWidth;
+    private float bgCardHeight;
+    private float bgGapsV;
+    private float bgGapsH;
 
     public DataLogicModelImpl getModel() {
         return model;
@@ -45,6 +49,15 @@ public class GameFrameGroup extends BaseGroup {
     }
 
     public void restart() {
+        for(int i = 0; i < ROW; i ++) {
+            for (int j = 0; j < COL; j ++) {
+                cardArray[i][j].remove();
+                cardArray[i][j] = new CardGroup(getMelodyGame());
+                cardArray[i][j].setNumStr("0");
+                cardArray[i][j].setSize(bgCardWidth, bgCardHeight);
+                addActor(cardArray[i][j]);
+            }
+        }
         model.initData();
 
         /* set images of main cards */
@@ -70,12 +83,12 @@ public class GameFrameGroup extends BaseGroup {
         }
 
         /* Gain the width and height of background card */
-        float bgCardWidth = bgArray[0][0].getWidth();
-        float bgCardHeight = bgArray[0][0].getHeight();
+         bgCardWidth = bgArray[0][0].getWidth();
+         bgCardHeight = bgArray[0][0].getHeight();
 
         /* calculate gaps */
-        float bgGapsV = (this.getWidth() - COL * bgCardWidth) / (COL + 1);
-        float bgGapsH = (this.getHeight() - ROW * bgCardHeight) / (ROW + 1);
+         bgGapsV = (this.getWidth() - COL * bgCardWidth) / (COL + 1);
+         bgGapsH = (this.getHeight() - ROW * bgCardHeight) / (ROW + 1);
 
         /* background card layout */
         for(int i = 0; i < ROW; i ++) {
@@ -102,15 +115,8 @@ public class GameFrameGroup extends BaseGroup {
         model.initData();
 
         /* set images of main cards */
-        sync();
-
         /* main cards layout */
-        for(int i = 0; i < ROW; i ++) {
-            for(int j = 0; j < COL; j ++) {
-                cardArray[i][j].setX(bgGapsV + j * (bgCardWidth + bgGapsV));
-                cardArray[i][j].setY(bgGapsH + i * (bgCardHeight + bgGapsH));
-            }
-        }
+        sync();
 
         /* score card */
         scoreSync();
@@ -152,16 +158,21 @@ public class GameFrameGroup extends BaseGroup {
 
                 if(model.getIsOver()) {
                     Gdx.app.error("OVER", "OVER");
+                    getMelodyGame().over();
                 }
             }
         });
     }
 
-    private void sync() {
-        ot();
+    public void sync() {
         for(int i = 0; i < ROW; i ++) {
             for(int j = 0; j < COL; j ++) {
-                cardArray[i][j].setNumStr(String.valueOf(model.getData()[i][j]));
+//                if(model.getData()[i][j] != 0) {
+                    cardArray[i][j].setNumStr(String.valueOf(model.getData()[i][j]));
+
+                    cardArray[i][j].setX(bgGapsV + j * (bgCardWidth + bgGapsV));
+                    cardArray[i][j].setY(bgGapsH + i * (bgCardHeight + bgGapsH));
+//                }
             }
         }
     }
@@ -186,13 +197,6 @@ public class GameFrameGroup extends BaseGroup {
         }
     }
 
-    // test1
-    private void ot() {
-        for(int i = 0; i < ROW; i ++) {
-            Gdx.app.error("OTCARD:", Arrays.toString(model.getData()[i]));
-        }
-    }
-
 
     private class CurrentDataListener implements IDataLogicModel.DataListener {
 
@@ -207,10 +211,10 @@ public class GameFrameGroup extends BaseGroup {
         @Override
         public void onOperateCard(int type) {
             switch (type) {
-                case 1:model.swipeUp();sync();break;
-                case 2:model.swipeDown();sync();break;
-                case 3:model.swipeLeft();sync();break;
-                case 4:model.swipeRight();sync();break;
+                case 1:model.swipeUp();break;
+                case 2:model.swipeDown();break;
+                case 3:model.swipeLeft();break;
+                case 4:model.swipeRight();break;
             }
         }
 
@@ -223,26 +227,57 @@ public class GameFrameGroup extends BaseGroup {
          * @param nj next j
          */
         @Override
-        public void onMoveCard(int i, int j, int ni, int nj) {
-//            cardArray[i][j].remove();
-//            addActor(cardArray[i][j]);
-            float x = cardArray[i][j].getX();
-            float y = cardArray[i][j].getY();
+        public void onMoveCard(int i, int j, int ni, int nj, boolean isMerge) {
+            cardArray[i][j].remove();
+            cardArray[i][j] = new CardGroup(getMelodyGame());
+            cardArray[i][j].setNumStr("0");
+            cardArray[i][j].setSize(bgCardWidth, bgCardHeight);
+            addActor(cardArray[i][j]);
 
-            float nx = cardArray[ni][nj].getX();
-            float ny = cardArray[ni][nj].getY();
+//            addActor(cardArray[ni][nj]);
+            float x = bgArray[i][j].getX();
+            float y = bgArray[i][j].getY();
 
-            MoveToAction moveBefore = Actions.moveTo(x, y);
+            float nx = bgArray[ni][nj].getX();
+            float ny = bgArray[ni][nj].getY();
 
-            MoveToAction moveTo = Actions.moveTo(nx, ny, 0.6f);
+            if(isMerge) {
+                int num = model.getData()[ni][nj];
+                CardGroup tmp = new CardGroup(getMelodyGame());
+                tmp.setNumStr(String.valueOf(num / 2));
+                tmp.setSize(bgCardWidth, bgCardHeight);
+                tmp.setPosition(x, y);
+                addActor(tmp);
+
+                MoveToAction action1 = Actions.moveTo(nx, ny, 0.6f);
+
+                DelayAction delay = Actions.delay(0.6f);
+                SequenceAction sequenceAction = Actions.sequence(action1, delay);
+                Actions.after(sequenceAction);
+                tmp.addAction(sequenceAction);
+
+                tmp.remove();
+
+
+            } else {
+                MoveToAction moveBefore = Actions.moveTo(x, y);
+
+                MoveToAction moveTo = Actions.moveTo(nx, ny, 0.2f);
 
 //            MoveToAction moveBack = Actions.moveTo(x, y);
 
-            DelayAction delay = Actions.delay(0.05f);
+                DelayAction delay = Actions.delay(0.05f);
 
-            SequenceAction sequenceAction = Actions.sequence(moveBefore, delay, moveTo);
+                SequenceAction sequenceAction = Actions.sequence(moveBefore, delay, moveTo);
 //            moveArray[i][j].addAction(sequenceAction);
-            cardArray[ni][nj].addAction(sequenceAction);
+                cardArray[ni][nj].addAction(sequenceAction);
+//                cardArray[i][j].remove();
+            }
+
+
+            Gdx.app.error("MOVE", "x:" + i + " y:" + j + " nx:" + ni + " ny:" + nj);
+
+
 
         }
 

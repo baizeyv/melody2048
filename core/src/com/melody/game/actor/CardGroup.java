@@ -12,29 +12,34 @@ public class CardGroup extends BaseGroup {
 
     private String numStr;
 
+    private float height;
+
+    private float width;
+
     public CardGroup(MelodyGame melodyGame) {
         super(melodyGame);
         init();
     }
 
     private void init() {
-        card = new Image(getMelodyGame().getAtlas().findRegion(Res.ATLAS_RES.GAME_CARD_EMPTY));
+        card = new Image();
         this.addActor(card);
 
-        this.setSize(card.getWidth(), card.getHeight());
+        Image tmp = new Image(getMelodyGame().getAtlas().findRegion(Res.ATLAS_RES.GAME_CARD_EMPTY));
+        width = tmp.getWidth();
+        height = tmp.getHeight();
+
+        this.setSize(width, height);
 
     }
 
     public void setNumStr(String numStr) {
         this.numStr = numStr;
-        if(numStr.equals("0")) {
-            card.setDrawable(new TextureRegionDrawable(
-                    getMelodyGame().getAtlas().findRegion(Res.ATLAS_RES.GAME_CARD_EMPTY)
-            ));
-        } else {
+        if(!numStr.equals("0")) {
             card.setDrawable(new TextureRegionDrawable(
                     getMelodyGame().getAtlas().findRegion(numStr)
             ));
+            card.setSize(width, height);
         }
 
     }

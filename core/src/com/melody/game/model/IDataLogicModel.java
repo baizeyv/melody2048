@@ -5,7 +5,7 @@ public interface IDataLogicModel {
     interface DataListener {
         void onGenerateNewCard(int row, int col);
         void onOperateCard(int type);
-        void onMoveCard(int originI, int originJ, int currentI, int currentJ);
+        void onMoveCard(int originI, int originJ, int currentI, int currentJ, boolean isMerge);
         void onScoreChange();
     }
 

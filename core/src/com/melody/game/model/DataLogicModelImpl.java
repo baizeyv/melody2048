@@ -2,6 +2,7 @@ package com.melody.game.model;
 
 import com.badlogic.gdx.Gdx;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class DataLogicModelImpl implements IDataLogicModel {
@@ -95,6 +96,47 @@ public class DataLogicModelImpl implements IDataLogicModel {
         }
     }
 
+    /*public void swipeLeft() {
+        boolean flag = false;
+
+        for(int i = 0; i < data.length; i ++) { // iterate over each line
+            int x = 0, y = 1;
+            while (x < data[i].length && y <data[i].length) {
+                if(data[x][i] == data[y][i]) {
+                    data[x][i] *= 2;
+                    data[y][i] = 0;
+                    currentScore += data[x][i];
+                    flag = true;
+                    if(dataListener != null) {
+                        dataListener.onMoveCard(x, i,y , i);
+                        dataListener.onScoreChange();
+                    }
+                    y++;
+                } else if (data[x][i] == 0 || data[y][i] != 0) {
+                    x = y;
+                    y++;
+                }
+            }
+            int ptr = 0;
+            for(int j = 0; j < data[i].length; j ++) {
+                if(data[j][i] == 0) {
+                    ptr++;
+                } else if(ptr != 0) {
+                    data[j - ptr][i] = data[j][i];
+                    data[j][i] = 0;
+                    flag = true;
+                }
+            }
+        }
+
+        if(flag) {
+            generateCardNumber();
+            if(!checkMovable()) {
+                isOver = true;
+            }
+        }
+    }*/
+
     public void swipeLeft() {
         boolean flag = false;
         for(int i = 0; i < data.length; i ++) { // iterate over each line
@@ -113,14 +155,14 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         currentScore += data[i][j];
                         flag = true;
                         if(dataListener != null) {
-                            dataListener.onMoveCard(i, k, i, j);
+                            dataListener.onMoveCard(i, k, i, j, true);
                             dataListener.onScoreChange();
                         }
                     }
                     break;
                 }
             }
-
+            ot("before");
             // move card
             for(int j = 0; j < data[i].length; j ++) {
                 if(data[i][j] == 0) {
@@ -132,12 +174,13 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         data[i][k] = 0;
                         flag = true;
                         if(dataListener != null) {
-                            dataListener.onMoveCard(i, k, i, j);
+                            dataListener.onMoveCard(i, k, i, j, false);
                         }
                         break;
                     }
                 }
             }
+            ot("after");
         }
         if(flag) {
             generateCardNumber();
@@ -165,13 +208,14 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         data[k][i] = 0;
                         currentScore += data[j][i];
                         flag = true;if(dataListener != null) {
-                            dataListener.onMoveCard(j, i, k, i);
+                            dataListener.onMoveCard(k, i, j, i, true);
                             dataListener.onScoreChange();
                         }
                     }
                     break;
                 }
             }
+            ot("before");
 
             // move card
             for(int j = 0; j < data[i].length; j ++) {
@@ -184,18 +228,25 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         data[k][i] = 0;
                         flag = true;
                         if(dataListener != null) {
-                            dataListener.onMoveCard(k, i, j, i);
+                            dataListener.onMoveCard(k, i, j, i, false);
                         }
                         break;
                     }
                 }
             }
+            ot("after");
         }
         if(flag) {
             generateCardNumber();
             if(!checkMovable()) {
                 isOver = true;
             }
+        }
+    }
+
+    private void ot(String str) {
+        for(int i = 0; i < 4; i ++) {
+            Gdx.app.error(str, Arrays.toString(data[i]));
         }
     }
 
@@ -217,13 +268,14 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         currentScore += data[i][j];
                         flag = true;
                         if(dataListener != null) {
-                            dataListener.onMoveCard(i, k, i, j);
+                            dataListener.onMoveCard(i, k, i, j, true);
                             dataListener.onScoreChange();
                         }
                     }
                     break;
                 }
             }
+            ot("before:");
 
             // move card
             for(int j = data[i].length - 1; j >= 0; j --) {
@@ -236,12 +288,13 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         data[i][k] = 0;
                         flag = true;
                         if(dataListener != null) {
-                            dataListener.onMoveCard(i, k, i, j);
+                            dataListener.onMoveCard(i, k, i, j, false);
                         }
                         break;
                     }
                 }
             }
+            ot("after:");
         }
         if(flag) {
             generateCardNumber();
@@ -273,14 +326,14 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         currentScore += data[j][i];
                         flag = true;
                         if(dataListener != null) {
-                            dataListener.onMoveCard(k, i, j, i);
+                            dataListener.onMoveCard(k, i, j, i, true);
                             dataListener.onScoreChange();
                         }
                     }
                     break;
                 }
             }
-
+            ot("befroe");
             // move card
             for(int j = data[i].length - 1; j >= 0; j --) {
                 if(data[j][i] == 0) {
@@ -292,12 +345,13 @@ public class DataLogicModelImpl implements IDataLogicModel {
                         data[k][i] = 0;
                         flag = true;
                         if(dataListener != null) {
-                            dataListener.onMoveCard(k, i, j, i);
+                            dataListener.onMoveCard(k, i, j, i, false);
                         }
                         break;
                     }
                 }
             }
+            ot("aft");
         }
         if(flag) {
             generateCardNumber();
